@@ -6,6 +6,7 @@ RSpec.describe User, type: :model do
   end
   describe "User" do
     it "should be created with valid attribute" do
+
       count = 0
       @user.save
       expect(@user.valid?).to eq(true)
