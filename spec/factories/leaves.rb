@@ -1,8 +1,8 @@
 FactoryBot.define do
   factory :leafe do
-    start_date {"2020-01-01"}
-    end_date {"2020-02-02"}
+    start_date {Date.today}
+    end_date {Date.today + 2.days}
     reason {"Fever"}
-    leave_type {"Fever"}
+    leave_type {"Personal Leave"}
   end
 end
