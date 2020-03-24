@@ -21,18 +21,17 @@ RSpec.describe Expense, type: :model do
 
   describe "Expense" do
     it "should be approved automatically submitted by admin" do
-      user = FactoryBot.build(:user)
-      user.role = "Admin"
-      expense = FactoryBot.build(:expense, user: user, category: @category)
+      @expense = FactoryBot.build(:expense, user: @user, category: @category)
       @budget.save
-      expense.save
-      expect(expense.cost).to eq(expense.budget.expense)
+      @expense.save
+      expect(@expense.cost).to eq(@expense.budget.expense)
       expect(Expense.approved.count).to eq(1)
     end
   end
 
   describe "Expense" do
     it "should decrease budget amount by approving an expense" do
+      @expense.user.role = "Employee"
       @budget.save
       @expense.save
       @expense.approved!
@@ -43,6 +42,7 @@ RSpec.describe Expense, type: :model do
 
   describe "Expense" do
     it "should increase budget amount by making undo of an expense" do
+      @expense.user.role = "Employee"
       @budget.save
       @expense.save
       @expense.approved!
@@ -76,6 +76,4 @@ RSpec.describe Expense, type: :model do
       expect(count).to eq(Expense.count)
     end
   end
-
-
 end
