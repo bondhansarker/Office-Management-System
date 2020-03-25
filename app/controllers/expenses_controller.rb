@@ -4,6 +4,7 @@ class ExpensesController < ApplicationController
   load_and_authorize_resource
 
   def index
+    raise @expenses.inspect
     @expenses = @expenses.includes(:user)
     if params[:search].present?
       search = "%#{params[:search]}%"
