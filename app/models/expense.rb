@@ -41,7 +41,7 @@ class Expense < ApplicationRecord
     else
       self.budget = Budget.find_by(month: self.expense_date.month, year: self.expense_date.year , category_id: self.category_id)
       if self.budget.blank?
-        self.errors.add(:budget, :not_specified, message: " for #{Date::MONTHNAMES[self.expense_date.month]}, #{self.expense_date.year} is not submitted yet!!")
+        self.errors.add(:budget, :not_specified, message: "for #{Date::MONTHNAMES[self.expense_date.month]}, #{self.expense_date.year} is not submitted yet!!")
       end
     end
   end
