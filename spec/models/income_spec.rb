@@ -5,6 +5,17 @@ RSpec.describe Income, type: :model do
     @user = FactoryBot.build(:user)
   end
 
+  describe "Create" do
+    it "should be created with valid attributes" do
+      count = 0
+      @user.save
+      @income = FactoryBot.create(:income, user: @user)
+      @income.save
+      expect(@income.valid?).to eq(true)
+      expect(count+1).to eq(Income.count)
+    end
+  end
+
   describe "scope testing" do
     context ".find_in_income_date_by" do
       it "should return a collection of incomes when search is based on month" do

@@ -7,6 +7,17 @@ RSpec.describe Leafe, type: :model do
     @leafe = FactoryBot.build(:leafe, user: @user)
   end
 
+  describe "Create" do
+    it "should be created with valid attributes" do
+      count = 0
+      @user.save
+      @allocated_leafe.save
+      @leafe.save
+      expect(@leafe.valid?).to eq(true)
+      expect(count+1).to eq(Leafe.count)
+    end
+  end
+
   describe "scope testing" do
     context ".with_leafe_type" do
       it "should return collection of leave with given type" do
