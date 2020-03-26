@@ -32,7 +32,7 @@ RSpec.describe Leafe, type: :model do
       it "should update the user's allocated leave" do
         @leafe.status = 1
         @leafe.update_allocated_leave
-        expect(@leafe.user.allocated_leafe.used_leave).to eq(2)
+        expect(@leafe.user.allocated_leafe.used_leave).to eq(3)
       end
     end
 
@@ -64,7 +64,7 @@ RSpec.describe Leafe, type: :model do
 
       it "should return number of days for valid date range" do
         days = Leafe.count_days(@leafe.start_date, @leafe.end_date)
-        expect(days).to eq(2)
+        expect(days).to eq(3)
       end
     end
 

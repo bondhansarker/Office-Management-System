@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/rspec/rspec-rails
-  revision: 9c6c7db422a0376c9307d091e28e276e75771d74
+  revision: 6ffb5206e6429fc66e6116013b8daf8f80d389e0
   branch: 4-0-maintenance
   specs:
     rspec-rails (4.0.0)
@@ -103,7 +103,7 @@ GEM
       warden (~> 1.2.3)
     diff-lcs (1.3)
     erubi (1.9.0)
-    factory_bot (5.1.1)
+    factory_bot (5.1.2)
       activesupport (>= 4.2.0)
     factory_bot_rails (5.1.1)
       factory_bot (~> 5.1.0)

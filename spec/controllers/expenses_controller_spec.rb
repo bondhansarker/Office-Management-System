@@ -97,4 +97,13 @@ RSpec.describe ExpensesController, type: :controller do
     end
   end
 
+  describe "PUT 'Reject'" do
+    it "should be successful" do
+      @expense.pending!
+      delete :destroy, params: {id: @expense.id}
+      expect(response).to redirect_to(expenses_url)
+      expect(flash[:alert]).to eq("Expense has been removed successfully!!")
+    end
+  end
+
 end

@@ -29,7 +29,7 @@ RSpec.describe BudgetsController, type: :controller do
   describe "POST 'create'" do
     it "should be successful" do
       params = FactoryBot.attributes_for :budget
-      params.merge!(category_id: @category.id, month:2)
+      params.merge!({category_id: @category.id, month:2})
       post :create, params: {budget: params}
       last_created_budget = Budget.last
       expect(last_created_budget.year).to eq(@budget.year)
