@@ -15,26 +15,4 @@ RSpec.describe AttendancesController, type: :controller do
       expect(response).to be_successful
     end
   end
-
-
-  # describe "POST 'create'" do
-  #   it "should be successful" do
-  #     post :create
-  #     last_created_attendance = Attendance.last
-  #     expect(last_created_attendance.date).to eq(Date.today.to_date)
-  #     expect(last_created_attendance.status).to eq(true)
-  #     expect(response).to redirect_to(:back)
-  #     expect(flash[:notice]).to eq("You have Checked In Successfully!!")
-  #   end
-  # end
-  #
-  # describe "PUT 'update'" do
-  #   it "should be successful" do
-  #     put :update, params: {id: @attendance.id}
-  #     @attendance.reload
-  #     expect(@attendance.status).to eq(false)
-  #     expect(flash[:notice]).to eq("You have checked Out Successfully!!")
-  #   end
-  # end
-
 end
