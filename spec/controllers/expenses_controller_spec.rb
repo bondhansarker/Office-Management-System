@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe ExpensesController, type: :controller do
 
   before(:each) do
-    @user = FactoryBot.build(:user)
+    @user = FactoryBot.create(:user)
     @category = FactoryBot.create(:category)
     @budget = FactoryBot.create(:budget, user: @user, category: @category)
     @expense = FactoryBot.create(:expense, user: @user, category: @category)
