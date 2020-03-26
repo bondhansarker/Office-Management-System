@@ -28,10 +28,8 @@ class BudgetsController < ApplicationController
   end
 
   def update
-    month = @budget.month
-    year = @budget.year
     if @budget.update(budget_params)
-      redirect_to show_all_budgets_path(month: month, year: year), notice: 'Budget has been updated successfully!!'
+      redirect_to show_all_budgets_path(month: @budget.month, year: @budget.year), notice: 'Budget has been updated successfully!!'
     else
       render :edit
     end

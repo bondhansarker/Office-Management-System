@@ -25,7 +25,7 @@ class AttendancesController < ApplicationController
     redirect_back(fallback_location: root_path , notice: "You have checked Out Successfully!!")
   end
 
-  def whitelisted?(ip)
+  def whitelisted?(ip) #stub
     ip_address = Rails.env.development? ? Attendance::LOCALHOST_IP_ADDRESS : Attendance::OFFICE_IP_ADDRESSES
     ip_address.include?(ip)
   end

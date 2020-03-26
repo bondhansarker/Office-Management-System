@@ -32,9 +32,10 @@ group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'sqlite3'
-  gem "rspec-rails", ">= 3.0.2"
   gem "factory_bot_rails"
   gem "faker"
+  gem 'rspec-rails', git: 'https://github.com/rspec/rspec-rails', branch: "4-0-maintenance"
+  gem 'rails-controller-testing'
 end
 
 group :development do
@@ -69,3 +70,4 @@ gem 'cancancan'
 gem 'chartkick'
 gem 'groupdate'
 gem "font-awesome-rails"
+
