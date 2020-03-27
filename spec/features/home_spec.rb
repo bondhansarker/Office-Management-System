@@ -11,12 +11,15 @@ RSpec.feature "Home", type: :feature do
   context "sign in" do
     it "displays the dashboard of the application" do
       driver.get("http://localhost:3000")
-      sleep(3)
-=begin
-      driver.find_element(name: "user_email").send_keys(@user.email)
-      driver.find_element(name: "user_password").send_keys("111111")
+      driver.find_element(:css, "#user_email").send_keys("admin@rightcodes.org")
+      driver.find_element(:css, "#user_password").send_keys("111111")
       driver.find_element(css: "input[type='submit']").click
-=end
+      element = driver.find_element(:css, "h3").text
+      "User Dashboard".eql? element
+      sleep(5)
+
+      driver.quit
+
 
     end
   end
