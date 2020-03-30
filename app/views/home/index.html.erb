@@ -1,5 +1,5 @@
+<h3 class="justify-content-center"><%= current_user.role %>'s Dashboard </h3>
 <% if current_user.admin? || current_user.super_admin? %>
-  <h3 class="justify-content-center">User Dashboard </h3>
   <br>
   <div class="row">
     <div class="container col-md-6">

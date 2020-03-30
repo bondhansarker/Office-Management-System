@@ -17,7 +17,10 @@ end
 
 Capybara.javascript_driver = :chrome
 
-Dir[Rails.root.join('spec', 'support', '**', '*.rb')].each { |f| require f }
+Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
+
+#driver = Selenium::WebDriver.for :firefox
+
 
 begin
   ActiveRecord::Migration.maintain_test_schema!
