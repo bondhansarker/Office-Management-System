@@ -9,6 +9,7 @@ RSpec.feature "Home", type: :feature do
 
   context "sign in" do
     it "displays the dashboard of the application" do
+      sleep(20)
       driver.get("http://localhost:3000")
       sleep(5)
       driver.find_element(:css, "#user_email").send_keys("admin@rightcodes.org")

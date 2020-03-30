@@ -14,7 +14,7 @@
           <% if can? :show, User %>
             <li class="nav-item">
               <div>
-                <div class="dropdown" >
+                <div class="dropdown">
                   <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <strong> Employee </strong>
                   </button>
@@ -48,13 +48,13 @@
           <% if can? :show, Expense %>
             <li class="nav-item">
               <div>
-                <div class="dropdown" >
+                <div class="dropdown">
                   <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <strong> Expense </strong>
+                    <strong id="expense"> Expense </strong>
                   </button>
                   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <%= link_to "Add new expense", new_expense_path, class: 'dropdown-item' %>
-                    <%= link_to "Expenses", expenses_path, class: 'dropdown-item' %>
+                    <%= link_to "Add new expense", new_expense_path, class: 'dropdown-item', id: 'add_new_expense' %>
+                    <%= link_to "Expenses", expenses_path, class: 'dropdown-item', id: 'expenses' %>
                   </div>
                 </div>
               </div>
@@ -64,7 +64,7 @@
           <% if can? :show, Income %>
             <li class="nav-item">
               <div>
-                <div class="dropdown" >
+                <div class="dropdown">
                   <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <strong> Income </strong>
                   </button>
