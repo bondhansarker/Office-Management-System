@@ -1,5 +1,5 @@
 require 'rails_helper'
-driver = Selenium::WebDriver.for :chrome
+driver = Selenium::WebDriver.for :firefox
 
 RSpec.feature "Home", type: :feature do
 
