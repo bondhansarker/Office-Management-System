@@ -12,10 +12,4 @@ RSpec.configure do |config|
   config.shared_context_metadata_behavior = :apply_to_host_groups
   config.include Helper, type: :feature
 
-=begin
-  config.before :all do
-    driver = Selenium::WebDriver.for :firefox
-  end
-=end
-
 end
