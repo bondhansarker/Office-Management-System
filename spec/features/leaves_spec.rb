@@ -1,6 +1,8 @@
 require 'rails_helper'
 driver = Selenium::WebDriver.for :firefox
 
+
+
 RSpec.feature "Leaves", type: :feature do
   context "Appoint Leave" do
     it "should be successful" do
@@ -15,7 +17,7 @@ RSpec.feature "Leaves", type: :feature do
       driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(5) > div > div > div > a:nth-child(2)").click
       driver.find_element(:css, "h1").text.eql? "List of Leave of Year : 2020"
       sleep(1)
-      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > div.table-responsive-sm > table > tbody > tr:nth-child(3) > td:nth-child(6) > a:nth-child(3) > i").click
+      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > div.table-responsive-sm > table > tbody > tr:nth-child(2) > td:nth-child(6) > a:nth-child(3) > i").click
       sleep(1)
       driver.switch_to.alert.accept
       sleep(1)
