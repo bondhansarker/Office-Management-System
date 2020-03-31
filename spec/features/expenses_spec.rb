@@ -10,6 +10,7 @@ RSpec.feature "Expense", type: :feature do
   context "sign in" do
     it "displays the dashboard of the application" do
       driver.get("http://localhost:3000")
+
       driver.manage().window().maximize()
       sleep(2)
       driver.find_element(:css, "#user_email").send_keys("bondhansarker100@gmail.com")
