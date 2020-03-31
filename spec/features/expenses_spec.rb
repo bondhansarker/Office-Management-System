@@ -21,7 +21,7 @@ RSpec.feature "Expense", type: :feature do
       sleep(1)
       driver.find_element(:css, "#expense_product_name").send_keys("Test expense")
       driver.find_element(:css, "#expense_category_id").click
-      driver.find_element(:css, "#expense_category_id > option:nth-child(2)").click
+      driver.find_element(:css, "#expense_category_id > option:nth-child(1)").click
       sleep(1)
       driver.find_element(:css, "#expense_cost").send_keys("100")
       driver.find_element(:css, "#expense_details").send_keys("Running test")
@@ -43,7 +43,7 @@ RSpec.feature "Expense", type: :feature do
       sleep(1)
       driver.find_element(:css, "#expense_product_name").send_keys("Test expense")
       driver.find_element(:css, "#expense_category_id").click
-      driver.find_element(:css, "#expense_category_id > option:nth-child(2)").click
+      driver.find_element(:css, "#expense_category_id > option:nth-child(1)").click
       sleep(1)
       driver.find_element(:css, "#expense_cost").send_keys("100")
       driver.find_element(:css, "#expense_details").send_keys("Running test")

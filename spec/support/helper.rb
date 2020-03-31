@@ -31,11 +31,11 @@ module Helper
     sleep(2)
   end
 
-  def logout(driver)
+  def logout_from_system(driver)
     driver.find_element(:css, "#user_menu").click
-    sleep(0.5)
+    sleep(1)
     driver.find_element(:css, "#logout").click
-    driver.quit
+    #driver.quit
   end
 
 end

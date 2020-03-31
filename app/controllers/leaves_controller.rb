@@ -57,7 +57,12 @@ class LeavesController < ApplicationController
 
   def update
     if @leafe.update(leafe_params)
-      redirect_to show_all_allocated_leafe_path(@leafe.user.allocated_leafe), notice: 'Leave information has been updated'
+      flash[:notice] = 'Leave information has been updated'
+      if current_user.admin? || current_user.super_admin?
+        redirect_to show_all_allocated_leafe_path(@leafe.user.allocated_leafe)
+      else
+        redirect_to leaves_path
+      end
     else
       render :edit
     end
@@ -66,7 +71,12 @@ class LeavesController < ApplicationController
   def destroy
     user = @leafe.user
     if @leafe && @leafe.destroy
-      redirect_to show_all_allocated_leafe_path(user.allocated_leafe), notice: 'Information has heen destroyed'
+      flash[:notice] = 'Information has heen destroyed'
+      if current_user.admin? || current_user.super_admin?
+        redirect_to show_all_allocated_leafe_path(user.allocated_leafe)
+      else
+        redirect_to leaves_path
+      end
     else
       flash[:alert] = 'Leave could not be deleted!!'
       render :index
