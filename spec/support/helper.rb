@@ -38,4 +38,22 @@ module Helper
     #driver.quit
   end
 
+  def create_expense(driver,name,month)
+    driver.find_element(:css, "#expnese_menu").click
+    sleep(1)
+    driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(1) > div > div > div > a:nth-child(1)").click
+    sleep(1)
+    driver.find_element(:css, "#expense_product_name").send_keys("#{name}")
+    driver.find_element(:css, "#expense_category_id").click
+    driver.find_element(:css, "#expense_category_id > option:nth-child(2)").click
+    sleep(1)
+    driver.find_element(:css, "#expense_cost").send_keys("100")
+    driver.find_element(:css, "#expense_details").send_keys("Running test")
+    driver.find_element(:css, "#datepicker").send_keys("2020-#{month}-21")
+    sleep(1)
+    driver.find_element(css: "input[type='submit']").click
+    sleep(2)
+  end
+
+
 end
