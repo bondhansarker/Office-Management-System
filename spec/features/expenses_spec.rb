@@ -2,25 +2,20 @@ require 'rails_helper'
 driver = Selenium::WebDriver.for :firefox
 
 RSpec.feature "Expense", type: :feature do
-
-  before(:each) do
-    @user = FactoryBot.create(:user)
-  end
-
-  context "sign in" do
-    it "displays the dashboard of the application" do
+  context "Expense" do
+    it "displays operations of the application" do
       driver.get("http://localhost:3000")
 
       driver.manage().window().maximize()
       sleep(2)
-      driver.find_element(:css, "#user_email").send_keys("bondhansarker100@gmail.com")
+      driver.find_element(:css, "#user_email").send_keys("shariful.alam@rightcodes.org")
       driver.find_element(:css, "#user_password").send_keys("111111")
       sleep(2)
       driver.find_element(css: "input[type='submit']").click
       sleep(2)
-      driver.find_element(:css, "#expense").click
-      sleep(2)
-      driver.find_element(:css, "#add_new_expense").click
+      driver.find_element(:css, "#expnese_menu").click
+      sleep(20)
+      driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(1) > div > div > div > a:nth-child(1)").click
       sleep(2)
       driver.find_element(:css, "#expense_product_name").send_keys("Test expense")
       driver.find_element(:css, "#expense_category_id").click
@@ -46,8 +41,6 @@ RSpec.feature "Expense", type: :feature do
       driver.switch_to().alert().accept()
       sleep(2)
       driver.quit
-
     end
   end
-
 end
