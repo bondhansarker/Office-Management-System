@@ -1,5 +1,5 @@
 require 'rails_helper'
-driver = Selenium::WebDriver.for :chrome
+driver = Selenium::WebDriver.for :firefox
 
 RSpec.feature "Expense", type: :feature do
 
@@ -9,8 +9,8 @@ RSpec.feature "Expense", type: :feature do
 
   context "sign in" do
     it "displays the dashboard of the application" do
-      sleep(5)
       driver.get("http://localhost:3000")
+      driver.manage().window().maximize()
       sleep(2)
       driver.find_element(:css, "#user_email").send_keys("bondhansarker100@gmail.com")
       driver.find_element(:css, "#user_password").send_keys("111111")
@@ -36,10 +36,15 @@ RSpec.feature "Expense", type: :feature do
       sleep(2)
       driver.find_element(css: ".fa-edit").click
       sleep(2)
-      driver.find_element(:css, "#expense_product_name").send_keys("Edited Test expense")
+      driver.find_element(:css, "#expense_product_name").send_keys(" Edited ")
       sleep(2)
       driver.find_element(css: "input[type='submit']").click
-      sleep(20)
+      sleep(2)
+      driver.find_element(css: ".fa-trash").click
+      sleep(2)
+      driver.switch_to().alert().accept()
+      sleep(2)
+      driver.quit
 
     end
   end
