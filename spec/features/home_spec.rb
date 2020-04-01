@@ -1,5 +1,6 @@
 require 'rails_helper'
-driver = Selenium::WebDriver.for :firefox
+options = Selenium::WebDriver::Firefox::Options.new(args: ['-headless'])
+driver = Selenium::WebDriver.for :firefox, options: options
 
 RSpec.feature "Home", type: :feature do
 
@@ -10,15 +11,12 @@ RSpec.feature "Home", type: :feature do
   context "sign in" do
     it "displays the dashboard of the application" do
       login_as_super_admin(driver)
-      sleep(2)
       logout_from_system(driver)
-      sleep(2)
+      sleep(1)
       login_as_admin(driver)
-      sleep(2)
       logout_from_system(driver)
-      sleep(2)
+      sleep(1)
       login_as_employee(driver)
-      sleep(2)
       logout_from_system(driver)
 
       driver.quit
