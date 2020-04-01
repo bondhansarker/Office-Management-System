@@ -35,6 +35,7 @@ RSpec.feature "Budget", type: :feature do
       driver.find_element(:css, "#budget_category_id > option:nth-child(2)").click
       driver.find_element(:css, "#budget_amount").send_keys("10000")
       driver.find_element(:css, ".btn-success").click
+      sleep(1)
       driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > div.table-responsive-sm > table > tbody > tr > td:nth-child(2) > a").click
       driver.find_element(:css, "#budget_menu").click
       driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(2) > div > div > div > a:nth-child(1)").click
@@ -45,6 +46,7 @@ RSpec.feature "Budget", type: :feature do
       driver.find_element(:css, "#budget_category_id > option:nth-child(1)").click
       driver.find_element(:css, "#budget_amount").send_keys("10000")
       driver.find_element(:css, ".btn-success").click
+      sleep(1)
       driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > div.table-responsive-sm > table > tbody > tr > td:nth-child(2) > a").click
       driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > div.table-responsive-sm > table > tbody > tr:nth-child(1) > td:nth-child(5) > a:nth-child(1)").click
       driver.find_element(:css, "#budget_add").send_keys("5000")

@@ -3,6 +3,7 @@ module Helper
 
   def login_as_super_admin(driver)
     driver.get("http://localhost:3000")
+    sleep(1)
     driver.find_element(:css, "#user_email").send_keys("admin@rightcodes.org")
     driver.find_element(:css, "#user_password").send_keys("111111")
     driver.find_element(css: "input[type='submit']").click
@@ -12,6 +13,7 @@ module Helper
 
   def login_as_admin(driver)
     driver.get("http://localhost:3000")
+    sleep(1)
     driver.find_element(:css, "#user_email").send_keys("shariful.alam85@gmail.com")
     driver.find_element(:css, "#user_password").send_keys("111111")
     driver.find_element(css: "input[type='submit']").click
@@ -21,6 +23,7 @@ module Helper
 
   def login_as_employee(driver)
     driver.get("http://localhost:3000")
+    sleep(1)
     driver.find_element(:css, "#user_email").send_keys("shariful.alam@rightcodes.org")
     driver.find_element(:css, "#user_password").send_keys("111111")
     driver.find_element(css: "input[type='submit']").click
@@ -30,6 +33,7 @@ module Helper
 
   def logout_from_system(driver)
     driver.find_element(:css, "#user_menu").click
+    sleep(1)
     driver.find_element(:css, "#logout").click
   end
 

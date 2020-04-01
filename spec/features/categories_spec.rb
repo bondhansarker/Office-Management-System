@@ -34,6 +34,7 @@ RSpec.feature "Category", type: :feature do
 
   context "Delete Category" do
     it "should be successful" do
+      sleep(1)
       driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > div.table-responsive-sm > table > tbody > tr:nth-child(3) > td:nth-child(3) > a:nth-child(2)").click
       driver.switch_to.alert.accept
     end
@@ -41,6 +42,7 @@ RSpec.feature "Category", type: :feature do
 
   context "Edit" do
     it "should be successful" do
+      sleep(1)
       driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > div.table-responsive-sm > table > tbody > tr:nth-child(2) > td:nth-child(3) > a:nth-child(1)").click
       driver.find_element(:css, "#category_name").send_keys(" 2")
       driver.find_element(:css, ".btn-success").click

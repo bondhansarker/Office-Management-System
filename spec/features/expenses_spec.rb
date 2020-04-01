@@ -91,6 +91,7 @@ RSpec.feature "Expense", type: :feature do
       driver.switch_to.alert.accept
       driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-success").click
       driver.execute_script("window.scrollTo(0, 300)")
+      sleep(1)
       driver.find_element(:css, "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(1) > td:nth-child(6) > a:nth-child(1)").click
       driver.switch_to.alert.accept
       driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-success").click
@@ -106,6 +107,7 @@ RSpec.feature "Expense", type: :feature do
 
   context "Undo" do
     it "should be successful" do
+      sleep(1)
       driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-success").click
       sleep(1)
       driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")

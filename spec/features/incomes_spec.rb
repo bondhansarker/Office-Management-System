@@ -13,6 +13,7 @@ RSpec.feature "Incomes", type: :feature do
       driver.find_element(:css, "h1").text.eql? "Add Income"
       driver.find_element(:css, "#income_amount").send_keys(1000)
       driver.find_element(:css, "#datepicker").send_keys Date.today.beginning_of_week, :return
+      sleep(1)
       driver.find_element(:css, "#income_source").click
       driver.find_element(:css, "#income_source > option:nth-child(1)").click
       driver.find_element(css: "input[type='submit']").click
