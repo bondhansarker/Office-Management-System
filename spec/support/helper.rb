@@ -43,6 +43,8 @@ module Helper
     sleep(1)
     driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(1) > div > div > div > a:nth-child(1)").click
     sleep(1)
+    driver.current_url.eql? new_expense_url
+    driver.find_element(:css, "h1").text.eql? "Insert Expense Information"
     driver.find_element(:css, "#expense_product_name").send_keys("#{name}")
     driver.find_element(:css, "#expense_category_id").click
     driver.find_element(:css, "#expense_category_id > option:nth-child(2)").click

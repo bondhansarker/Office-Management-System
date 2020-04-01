@@ -12,6 +12,9 @@ RSpec.feature "Expense", type: :feature do
       sleep(1)
       driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(1) > div > div > div > a:nth-child(2)").click
       sleep(1)
+      driver.current_url.eql? expenses_url
+      driver.find_element(:css, "h1").text.eql? "Expense List"
+      sleep(1)
       create_expense(driver, "1. March Remove", "03")
       create_expense(driver, "2. March Reject", "03")
       driver.execute_script("window.scrollTo(0, 200)")
@@ -40,7 +43,9 @@ RSpec.feature "Expense", type: :feature do
     it "should be successful" do
       driver.find_element(css: "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(1) > td:nth-child(6) > a:nth-child(3)").click
       sleep(1)
-      driver.switch_to().alert().accept()
+      driver.switch_to.alert.accept
+      driver.current_url.eql? expenses_url
+      driver.find_element(:css, "h1").text.eql? "Expense List"
       sleep(1)
       driver.execute_script("window.scrollTo(0, 300)")
       sleep(2)
@@ -60,7 +65,7 @@ RSpec.feature "Expense", type: :feature do
     end
   end
 
-  context "Logout" do
+  context "Logout as Employee" do
     it "should be successful" do
       logout_from_system(driver)
     end
@@ -71,6 +76,8 @@ RSpec.feature "Expense", type: :feature do
       login_as_admin(driver)
       driver.find_element(:css, "#expnese_menu").click
       driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(3) > div > div > div > a:nth-child(2)").click
+      driver.current_url.eql? expenses_url
+      driver.find_element(:css, "h1").text.eql? "Expense List"
       sleep(1)
       driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-warning").click
       sleep(1)
@@ -96,7 +103,7 @@ RSpec.feature "Expense", type: :feature do
       sleep(1)
       driver.find_element(:css, "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(1) > td:nth-child(6) > a:nth-child(2)").click
       sleep(1)
-      driver.switch_to().alert().accept()
+      driver.switch_to.alert.accept
       sleep(1)
       driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
       sleep(1)
@@ -113,7 +120,7 @@ RSpec.feature "Expense", type: :feature do
       sleep(1)
       driver.find_element(:css, "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(1) > td:nth-child(6) > a:nth-child(1)").click
       sleep(1)
-      driver.switch_to().alert().accept()
+      driver.switch_to.alert.accept
       sleep(1)
       driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-success").click
       sleep(1)
@@ -121,7 +128,7 @@ RSpec.feature "Expense", type: :feature do
       sleep(1)
       driver.find_element(:css, "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(1) > td:nth-child(6) > a:nth-child(1)").click
       sleep(1)
-      driver.switch_to().alert().accept()
+      driver.switch_to.alert.accept
       sleep(1)
       driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-success").click
       sleep(1)
@@ -144,13 +151,17 @@ RSpec.feature "Expense", type: :feature do
       sleep(1)
       driver.find_element(:css, "#approved > div.table-responsive-sm > table > tbody > tr:nth-child(1) > td:nth-child(6) > a:nth-child(1)").click
       sleep(1)
-      driver.switch_to().alert().accept()
+      driver.switch_to.alert.accept
       sleep(1)
       driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-success").click
       sleep(1)
       driver.execute_script("window.scrollTo(0, 300)")
       sleep(2)
       driver.execute_script("window.scrollTo(document.body.scrollHeight,0)")
+      sleep(2)
+      driver.current_url.eql? expenses_url
+      driver.find_element(:css, "h1").text.eql? "Expense List"
+      logout_from_system(driver)
       sleep(2)
       driver.quit
     end
