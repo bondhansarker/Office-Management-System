@@ -31,7 +31,7 @@
 * Include the following gems in the `development` group of your Gemfile.
 
  
- `
+ ```
  
      group :development do
      
@@ -45,7 +45,7 @@
          
       end
   
- `
+ ```
  
  
    
