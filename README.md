@@ -31,17 +31,20 @@
 * Include the following gems in the `development` group of your Gemfile.
 
  
- `group :development do
+ `
  
-     gem "factory_bot_rails"
+     group :development do
      
-     gem "faker"
-     
-     gem 'rspec-rails', git: 'https://github.com/rspec/rspec-rails', branch: "4-0-maintenance" 
-     
-     gem 'rails-controller-testing'
-     
-  end
+         gem "factory_bot_rails"
+         
+         gem "faker"
+         
+         gem 'rspec-rails', git: 'https://github.com/rspec/rspec-rails', branch: "4-0-maintenance" 
+         
+         gem 'rails-controller-testing'
+         
+      end
+  
  `
  
  
