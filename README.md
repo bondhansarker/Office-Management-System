@@ -34,27 +34,28 @@
 ```ruby
     group :development do
          
-             gem "factory_bot_rails"
+         gem "factory_bot_rails"
+         
+         gem "faker"
+         
+         gem 'rspec-rails', git: 'https://github.com/rspec/rspec-rails', branch: "4-0-maintenance" 
+         
+         gem 'rails-controller-testing'
              
-             gem "faker"
-             
-             gem 'rspec-rails', git: 'https://github.com/rspec/rspec-rails', branch: "4-0-maintenance" 
-             
-             gem 'rails-controller-testing'
-             
-          end
+    end
 ```
  
  
    
 * Include the following gems in the `test` group of your Gemfile.
 
-
+```ruby
     group :test do
         gem 'capybara', '~> 2.7', '>= 2.7.1'
         gem 'selenium-webdriver'
         gem 'webdrivers'
     end
+```
     
 * Then run `bundle`
 
