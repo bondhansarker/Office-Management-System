@@ -46,7 +46,13 @@
     end
 ```
     
-* Run `bundle` in the terminal to install the gems.
+* Go to the project directory and run the following commands in the terminal.
+
+```text
+    rake db:create
+    rake db:migrate
+    bundle
+```
 
 * To run the test, just run `rspec` command in the terminal.
 
