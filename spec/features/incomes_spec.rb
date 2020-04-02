@@ -72,19 +72,12 @@ RSpec.feature "Incomes", type: :feature do
       driver.navigate.back
       driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-warning").click
       driver.find_element(:css, "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(2) > td:nth-child(5) > a:nth-child(2) > i").click
-      sleep(1)
       driver.find_element(:css, "#income_amount").clear
-      sleep(1)
       driver.find_element(:css, "#income_amount").send_keys(100000)
-      sleep(1)
       driver.find_element(css: "input[type='submit']").click
-      sleep(1)
       driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-warning").click
-      sleep(1)
       driver.find_element(:css, "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(2) > td:nth-child(5) > a:nth-child(3) > i").click
-      sleep(1)
       driver.switch_to.alert.accept
-      sleep(1)
       logout_from_system(driver)
       driver.quit
     end

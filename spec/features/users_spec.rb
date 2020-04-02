@@ -9,7 +9,6 @@ RSpec.feature "Users", type: :feature do
       login_as_admin(driver)
       driver.find_element(:css, "#user_menu").click
       driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(6) > div > div > div > a:nth-child(1)").click
-      sleep(1)
       driver.find_element(:css, "#employee_menu").click
       driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(1) > div > div > div > a:nth-child(1)").click
       element = driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > h2").text

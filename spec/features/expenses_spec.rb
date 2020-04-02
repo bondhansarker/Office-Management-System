@@ -7,6 +7,7 @@ RSpec.feature "Expense", type: :feature do
   context "Create" do
     it "should be successful" do
       login_as_employee(driver)
+      sleep(1)
       driver.manage().window().maximize()
       driver.find_element(:css, "#expnese_menu").click
       driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(1) > div > div > div > a:nth-child(2)").click
@@ -91,41 +92,29 @@ RSpec.feature "Expense", type: :feature do
       driver.switch_to.alert.accept
       driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-success").click
       driver.execute_script("window.scrollTo(0, 300)")
-      sleep(1)
       driver.find_element(:css, "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(1) > td:nth-child(6) > a:nth-child(1)").click
       driver.switch_to.alert.accept
       driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-success").click
       driver.execute_script("window.scrollTo(0, 300)")
       driver.find_element(:css, "#approved > div.table-responsive-sm > table > tbody > tr:nth-child(1) > td:nth-child(6) > a:nth-child(2)").click
-      sleep(1)
       driver.find_element(css: ".btn-dark").click
-      sleep(1)
       driver.execute_script("window.scrollTo(0, 300)")
-      sleep(3)
     end
   end
 
   context "Undo" do
     it "should be successful" do
-      sleep(1)
       driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-success").click
-      sleep(1)
       driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
-      sleep(1)
       driver.find_element(:css, "#approved > div.table-responsive-sm > table > tbody > tr:nth-child(1) > td:nth-child(6) > a:nth-child(1)").click
-      sleep(1)
       driver.switch_to.alert.accept
-      sleep(1)
       driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-success").click
-      sleep(1)
       driver.execute_script("window.scrollTo(0, 300)")
-      sleep(2)
       driver.execute_script("window.scrollTo(document.body.scrollHeight,0)")
-      sleep(2)
       driver.current_url.eql? expenses_url
       driver.find_element(:css, "h1").text.eql? "Expense List"
       logout_from_system(driver)
-      sleep(2)
+      sleep(1)
       driver.quit
     end
   end

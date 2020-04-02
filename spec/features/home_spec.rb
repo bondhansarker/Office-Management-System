@@ -18,7 +18,6 @@ RSpec.feature "Home", type: :feature do
       sleep(1)
       login_as_employee(driver)
       logout_from_system(driver)
-
       driver.quit
     end
   end
