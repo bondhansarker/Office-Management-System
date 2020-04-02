@@ -1,100 +1,195 @@
 require 'rails_helper'
-options = Selenium::WebDriver::Firefox::Options.new(args: ['-headless'])
-driver = Selenium::WebDriver.for :firefox, options: options
 
 RSpec.feature "Expense", type: :feature do
 
-  context "Create" do
+  before(:each) do
+    @user = FactoryBot.create(:user)
+    @user.role = "Employee"
+    @user.save
+    @category = FactoryBot.create(:category)
+    @budget = FactoryBot.create(:budget, user: @user, category: @category)
+    @expense = FactoryBot.create(:expense, user: @user, category: @category)
+    login_as(@user, :scope => :user)
+  end
+
+  describe "Create" do
     it "should be successful" do
-      login_as_employee(driver)
-      driver.manage().window().maximize()
-      driver.find_element(:css, "#expnese_menu").click
-      driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(1) > div > div > div > a:nth-child(2)").click
-      driver.current_url.eql? expenses_url
-      driver.find_element(:css, "h1").text.eql? "Expense List"
-      create_expense(driver, "1. March Remove", "03")
-      create_expense(driver, "2. March Reject", "03")
-      create_expense(driver, "3. March Undo", "03")
-      create_expense(driver, "4. March Approve", "03")
+      visit(root_url)
+      click_on 'Expense'
+      click_on 'Add new expense'
+      expect(current_url).to eq(new_expense_url)
+      expect(find(:css, "h1").text).to eq("Insert Expense Information")
+      within('form') do
+        fill_in 'expense_product_name', with: 'Test Expense form'
+        fill_in 'expense_cost', with: '1000'
+        fill_in 'datepicker', with: '2020-01-01'
+      end
+      click_on 'Submit'
+      expect(page).to have_content("Expense has been submitted for approval")
+      expect(current_url).to eq(expenses_url)
+      expect(find(:css, "h1").text).to eq("Expense List")
+      expect(2).to eq(Expense.count)
+      expect(page).to have_content("Pending (#{Expense.pending.count})")
+      expect(page).to have_content("Test Expense form")
     end
   end
 
-  context "Show" do
-    it "should be successful" do
-      driver.find_element(css: "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(1) > td:nth-child(6) > a:nth-child(1)").click
-      driver.find_element(css: ".btn-dark").click
+  describe "Show" do
+    context "Pending" do
+      it "should be successful" do
+        visit(expenses_url)
+        expect(current_url).to eq(expenses_url)
+        expect(find(:css, "h1").text).to eq("Expense List")
+        expect(page).to have_content("Pending (#{Expense.pending.count})")
+        expect(page).to have_content(@expense.product_name)
+        within('#pending') do
+          page.find('.show_link').click
+        end
+        within('.card') do
+          expect(page).to have_content(@expense.product_name)
+          expect(page).to have_content("Pending")
+          expect(current_url).to eq(expense_url(@expense))
+        end
+        page.find('.btn-dark').click
+        expect(current_url).to eq(expenses_url)
+      end
+    end
+
+    context "Approved" do
+      it "should be successful" do
+        @expense.approved!
+        visit(expenses_url)
+        expect(current_url).to eq(expenses_url)
+        expect(find(:css, "h1").text).to eq("Expense List")
+        expect(page).to have_content("Approved (#{Expense.approved.count})")
+        expect(page).to have_content(@expense.product_name)
+        within('#approved') do
+          page.find('.show_link').click
+        end
+        within('.card') do
+          expect(page).to have_content(@expense.product_name)
+          expect(page).to have_content("Approve Time")
+          expect(current_url).to eq(expense_url(@expense))
+        end
+        page.find('.btn-dark').click
+        expect(current_url).to eq(expenses_url)
+      end
     end
   end
 
   context "Destroy" do
     it "should be successful" do
-      driver.find_element(css: "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(1) > td:nth-child(6) > a:nth-child(3)").click
-      driver.switch_to.alert.accept
-      driver.current_url.eql? expenses_url
-      driver.find_element(:css, "h1").text.eql? "Expense List"
+      visit(expenses_url)
+      expect(current_url).to eq(expenses_url)
+      expect(find(:css, "h1").text).to eq("Expense List")
+      expect(page).to have_content("Pending (#{Expense.pending.count})")
+      expect(page).to have_content(@expense.product_name)
+      expect(1).to eq(Expense.count)
+      within('#pending') do
+        page.find('.destroy_link').click
+      end
+      expect(current_url).to eq(expenses_url)
+      expect(0).to eq(Expense.count)
+      expect(page).to have_content("Pending (#{Expense.pending.count})")
     end
   end
 
-  context "Edit_Update" do
+  context "Update" do
     it "should be successful" do
-      driver.find_element(css: "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(3) > td:nth-child(6) > a:nth-child(2)").click
-      driver.find_element(:css, "#expense_product_name").send_keys(" Edited ")
-      driver.find_element(css: "input[type='submit']").click
-    end
-  end
-
-  context "Logout as Employee" do
-    it "should be successful" do
-      logout_from_system(driver)
-    end
-  end
-
-  context "View all the expenses" do
-    it "should be successful" do
-      login_as_admin(driver)
-      driver.find_element(:css, "#expnese_menu").click
-      driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(3) > div > div > div > a:nth-child(2)").click
-      driver.current_url.eql? expenses_url
-      driver.find_element(:css, "h1").text.eql? "Expense List"
-      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-warning").click
-      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-success").click
-      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-danger").click
+      visit(expenses_url)
+      expect(current_url).to eq(expenses_url)
+      expect(find(:css, "h1").text).to eq("Expense List")
+      within('#pending') do
+        page.find('.edit_link').click
+      end
+      expect(page).to have_content("Edit Expense Information")
+      within('form') do
+        fill_in 'expense_product_name', with: 'Test Expense form'
+      end
+      click_on 'Update'
+      expect(page).to have_content("Expense has been updated successfully!!")
+      expect(current_url).to eq(expenses_url)
+      expect(find(:css, "h1").text).to eq("Expense List")
+      expect(page).to have_content("Test Expense form")
+      expect(Expense.last.product_name).to eq("Test Expense form")
     end
   end
 
   context "Reject" do
     it "should be successful" do
-      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-warning").click
-      driver.find_element(:css, "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(1) > td:nth-child(6) > a:nth-child(2)").click
-      driver.switch_to.alert.accept
-      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-danger").click
+      @user = FactoryBot.create(:user)
+      @user.role = "Admin"
+      @user.save
+      login_as(@user, :scope => :user)
+      visit(expenses_url)
+
+      expect(current_url).to eq(expenses_url)
+      expect(find(:css, "h1").text).to eq("Expense List")
+      expect(0).to eq(Expense.rejected.count)
+      expect(1).to eq(Expense.pending.count)
+      within('#pending') do
+        page.find('.reject_link').click
+      end
+      expect(page).to have_content("Expense has been rejected successfully!!")
+      expect(current_url).to eq(expenses_url)
+      expect(1).to eq(Expense.rejected.count)
+      expect(0).to eq(Expense.pending.count)
+      expect(page).to have_content("Rejected (#{Expense.rejected.count})")
     end
   end
 
-  context "Approve" do
-    it "should be successful" do
-      driver.find_element(:css, "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(2) > td:nth-child(6) > a:nth-child(1)").click
-      driver.switch_to.alert.accept
-      sleep(1)
-      driver.find_element(:css, "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(1) > td:nth-child(6) > a:nth-child(1)").click
-      driver.switch_to.alert.accept
-      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-success").click
-    end
-  end
+  describe "Approval" do
+    context "Approve" do
+      it "should be successful" do
+        @user = FactoryBot.create(:user)
+        @user.role = "Admin"
+        @user.save
+        login_as(@user, :scope => :user)
+        visit(expenses_url)
 
-  context "Undo" do
-    it "should be successful" do
-      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-success").click
-      driver.find_element(:css, "#approved > div.table-responsive-sm > table > tbody > tr:nth-child(1) > td:nth-child(6) > a:nth-child(2)").click
-      driver.find_element(:css, ".btn-dark").click
-      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-success").click
-      driver.find_element(:css, "#approved > div.table-responsive-sm > table > tbody > tr:nth-child(1) > td:nth-child(6) > a:nth-child(1)").click
-      driver.switch_to.alert.accept
-      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-success").click
-      driver.current_url.eql? expenses_url
-      driver.find_element(:css, "h1").text.eql? "Expense List"
-      logout_from_system(driver)
-      driver.quit
+        visit(expenses_url)
+        expect(current_url).to eq(expenses_url)
+        expect(find(:css, "h1").text).to eq("Expense List")
+        expect(0).to eq(Expense.approved.count)
+        expect(1).to eq(Expense.pending.count)
+
+        within('#pending') do
+          page.find('.approve_link').click
+        end
+        expect(page).to have_content("Expense has been approved successfully!!")
+        expect(current_url).to eq(expenses_url)
+
+        expect(0).to eq(Expense.pending.count)
+        expect(1).to eq(Expense.approved.count)
+        expect(page).to have_content("Approved (#{Expense.approved.count})")
+        expect(page).to have_content("Pending (#{Expense.pending.count})")
+      end
+    end
+
+    context "Undo" do
+      it "should be successful" do
+        @user = FactoryBot.create(:user)
+        @user.role = "Admin"
+        @user.save
+        login_as(@user, :scope => :user)
+        @expense.approved!
+
+        visit(expenses_url)
+        expect(current_url).to eq(expenses_url)
+        expect(find(:css, "h1").text).to eq("Expense List")
+        expect(1).to eq(Expense.approved.count)
+        expect(0).to eq(Expense.pending.count)
+
+        within('#approved') do
+          page.find('.undo_link').click
+        end
+        expect(page).to have_content("The Expense has been queued for pending!!")
+        expect(current_url).to eq(expenses_url)
+        expect(1).to eq(Expense.pending.count)
+        expect(0).to eq(Expense.approved.count)
+        expect(page).to have_content("Approved (#{Expense.approved.count})")
+        expect(page).to have_content("Pending (#{Expense.pending.count})")
+      end
     end
   end
 end
