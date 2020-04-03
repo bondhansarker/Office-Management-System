@@ -22,11 +22,11 @@
         <td><%= taka(budget.amount - budget.expense) %></td>
 
         <td style="text-align: center;">
-          <%= link_to edit_budget_path(budget) do %>
+          <%= link_to edit_budget_path(budget) ,class:"edit_link" do %>
             <i class="fa fa-edit" title="Edit"></i>
           <% end %>
           |
-          <%= link_to budget_path(budget), method: :delete, data: {confirm: 'Are you sure?'} do %>
+          <%= link_to budget_path(budget), method: :delete, data: {confirm: 'Are you sure?'},class: "destroy_link" do %>
             <i class="fa fa-trash" title="Drop"></i>
           <% end %>
         </td>

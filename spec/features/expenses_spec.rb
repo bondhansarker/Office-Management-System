@@ -104,14 +104,14 @@ RSpec.feature "Expense", type: :feature do
       end
       expect(page).to have_content("Edit Expense Information")
       within('form') do
-        fill_in 'expense_product_name', with: 'Test Expense form'
+        fill_in 'expense_product_name', with: 'Test Expense'
       end
       click_on 'Update'
       expect(page).to have_content("Expense has been updated successfully!!")
       expect(current_url).to eq(expenses_url)
       expect(find(:css, "h1").text).to eq("Expense List")
-      expect(page).to have_content("Test Expense form")
-      expect(Expense.last.product_name).to eq("Test Expense form")
+      expect(page).to have_content("Test Expense")
+      expect(Expense.last.product_name).to eq("Test Expense")
     end
   end
 

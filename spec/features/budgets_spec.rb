@@ -4,77 +4,116 @@ driver = Selenium::WebDriver.for :firefox, options: options
 
 RSpec.feature "Budget", type: :feature do
 
-  context "Category Create" do
+  before(:each) do
+    @user = FactoryBot.create(:user)
+    @category = FactoryBot.create(:category)
+    @budget = FactoryBot.create(:budget, user: @user, category: @category)
+    login_as(@user, :scope => :user)
+  end
+
+  describe "Create" do
     it "should be successful" do
-      login_as_admin(driver)
-      driver.manage().window().maximize()
-      driver.find_element(:css, "#budget_menu").click
-      driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(2) > div > div > div > a:nth-child(4)").click
-      expect(driver.current_url).to eq("http://localhost:3000#{budgets_path}")
-      driver.find_element(:css, "#budget_menu").click
-      driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(2) > div > div > div > a:nth-child(1)").click
-      expect(driver.find_element(:css, "h1").text).to eq("Insert Budget Information")
-      driver.find_element(:css, ".btn-success").click
-      driver.find_element(:css, "#budget_menu").click
-      driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(2) > div > div > div > a:nth-child(3)").click
-      driver.find_element(:css, "#budget_menu").click
-      driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(2) > div > div > div > a:nth-child(2)").click
-      driver.find_element(:css, "#category_name").send_keys("Category 1")
-      driver.find_element(:css, ".btn-success").click
-      driver.find_element(:css, "#budget_menu").click
-      driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(2) > div > div > div > a:nth-child(2)").click
-      driver.find_element(:css, "#category_name").send_keys("Category")
-      driver.find_element(:css, ".btn-success").click
-      driver.find_element(:css, "#budget_menu").click
-      driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(2) > div > div > div > a:nth-child(2)").click
-      driver.find_element(:css, "#category_name").send_keys("Delete")
-      driver.find_element(:css, ".btn-success").click
+      category1 = FactoryBot.build(:category)
+      category1.name = "Category 1"
+      category1.save
+      visit(root_url)
+      click_on 'Budget'
+      click_on 'Add new budget'
+      expect(current_url).to eq(new_budget_url)
+      expect(find(:css, "h1").text).to eq("Insert Budget Information")
+      within('form') do
+        find('#budget_year').find(:xpath, 'option[1]').select_option
+        find('#budget_month').find(:xpath, 'option[1]').select_option
+        find('#budget_category_id').find(:xpath, 'option[2]').select_option
+        fill_in 'budget_amount', with: '10000'
+      end
+      click_on 'Submit'
+      expect(page).to have_content("Budget has been created successfully!!")
+      expect(current_url).to eq(budgets_url)
+      expect(find(:css, "h1").text).to eq("Budget List for #{Date.today.year}")
+      expect(page).to have_content(@budget.month)
     end
   end
 
-  context "Category Delete" do
-    it "should be successful" do
-      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > div.table-responsive-sm > table > tbody > tr:nth-child(3) > td:nth-child(3) > a:nth-child(2)").click
-      driver.switch_to.alert.accept
+  describe "Show" do
+    context "all budgets of a month" do
+      it "should be successful" do
+        visit(budgets_url)
+        expect(current_url).to eq(budgets_url)
+        expect(find(:css, "h1").text).to eq("Budget List for #{Date.today.year}")
+        expect(page).to have_content(@budget.month)
+        within('.table') do
+          page.find('.show_budgets_link').click
+        end
+        expect(current_url).to eq("#{show_all_budgets_url}?month=#{@budget.month}&year=#{@budget.year}")
+        expect(find(:css, "h1").text).to eq("All Budgets for #{Date::MONTHNAMES[@budget.month]}, #{@budget.year}")
+      end
+    end
+
+    context "all expenses of a month" do
+      it "should be successful" do
+        @expense = FactoryBot.create(:expense, user: @user, category: @category)
+        visit(budgets_url)
+        expect(current_url).to eq(budgets_url)
+        expect(find(:css, "h1").text).to eq("Budget List for #{Date.today.year}")
+        expect(page).to have_content(@budget.month)
+        within('.table') do
+          page.find('.show_expenses_link').click
+        end
+        expect(current_url).to eq("#{show_all_expenses_budgets_url}?month=#{@budget.month}&year=#{@budget.year}")
+        expect(find(:css, "h3").text).to eq("Expenses of #{Date::MONTHNAMES[@budget.month]}, #{@budget.year}")
+        expect(1).to eq(Expense.approved.count)
+        expect(page).to have_content("Approved (#{Expense.approved.count})")
+        expect(page).to have_content("Pending (#{Expense.pending.count})")
+        expect(page).to have_content("Pending (#{Expense.rejected.count})")
+      end
     end
   end
 
-  context "Category Edit" do
+  context "Destroy" do
     it "should be successful" do
-      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > div.table-responsive-sm > table > tbody > tr:nth-child(2) > td:nth-child(3) > a:nth-child(1)").click
-      driver.find_element(:css, "#category_name").send_keys(" 2")
-      driver.find_element(:css, ".btn-success").click
+      visit(budgets_url)
+      expect(current_url).to eq(budgets_url)
+      expect(find(:css, "h1").text).to eq("Budget List for #{Date.today.year}")
+      expect(page).to have_content(@budget.month)
+      within('.table') do
+        page.find('.show_budgets_link').click
+      end
+      expect(current_url).to eq("#{show_all_budgets_url}?month=#{@budget.month}&year=#{@budget.year}")
+      expect(find(:css, "h1").text).to eq("All Budgets for #{Date::MONTHNAMES[@budget.month]}, #{@budget.year}")
+      within('.table') do
+        page.find('.destroy_link').click
+      end
+      expect(current_url).to eq("#{show_all_budgets_url}?month=#{@budget.month}&year=#{@budget.year}")
+      expect(find(:css, "h1").text).to eq("All Budgets for #{Date::MONTHNAMES[@budget.month]}, #{@budget.year}")
+      expect(0).to eq(Budget.count)
     end
   end
 
-  context "Create" do
+  context "Update" do
     it "should be successful" do
-      driver.find_element(:css, "#budget_menu").click
-      driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(2) > div > div > div > a:nth-child(1)").click
-      expect(driver.find_element(:css, "h1").text).to eq("Insert Budget Information")
-      driver.find_element(:css, "#budget_month").click
-      driver.find_element(:css, "#budget_month > option:nth-child(3)").click
-      driver.find_element(:css, "#budget_category_id").click
-      driver.find_element(:css, "#budget_category_id > option:nth-child(2)").click
-      driver.find_element(:css, "#budget_amount").send_keys("10000")
-      driver.find_element(:css, ".btn-success").click
-      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > div.table-responsive-sm > table > tbody > tr > td:nth-child(2) > a").click
-      driver.find_element(:css, "#budget_menu").click
-      driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(2) > div > div > div > a:nth-child(1)").click
-      expect(driver.find_element(:css, "h1").text).to eq("Insert Budget Information")
-      driver.find_element(:css, "#budget_month").click
-      driver.find_element(:css, "#budget_month > option:nth-child(3)").click
-      driver.find_element(:css, "#budget_category_id").click
-      driver.find_element(:css, "#budget_category_id > option:nth-child(1)").click
-      driver.find_element(:css, "#budget_amount").send_keys("10000")
-      driver.find_element(:css, ".btn-success").click
-      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > div.table-responsive-sm > table > tbody > tr > td:nth-child(2) > a").click
-      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > div.table-responsive-sm > table > tbody > tr:nth-child(1) > td:nth-child(5) > a:nth-child(1)").click
-      driver.find_element(:css, "#budget_add").send_keys("5000")
-      driver.find_element(:css, ".btn-success").click
-      driver.find_element(:css, ".btn-dark").click
-      logout_from_system(driver)
-      driver.quit
+      visit(budgets_url)
+      expect(current_url).to eq(budgets_url)
+      expect(find(:css, "h1").text).to eq("Budget List for #{Date.today.year}")
+      expect(page).to have_content(@budget.month)
+      within('.table') do
+        page.find('.show_budgets_link').click
+      end
+      expect(current_url).to eq("#{show_all_budgets_url}?month=#{@budget.month}&year=#{@budget.year}")
+      expect(find(:css, "h1").text).to eq("All Budgets for #{Date::MONTHNAMES[@budget.month]}, #{@budget.year}")
+      expect(Budget.last.amount.to_i).to eq(10000)
+      within('.table') do
+        page.find('.edit_link').click
+      end
+      expect(page).to have_content("Edit Budget Information")
+      within('form') do
+        fill_in 'budget_add', with: '5000'
+      end
+      click_on 'Submit'
+      expect(page).to have_content("Budget has been updated successfully!!")
+      expect(current_url).to eq("#{show_all_budgets_url}?month=#{@budget.month}&year=#{@budget.year}")
+      expect(find(:css, "h1").text).to eq("All Budgets for #{Date::MONTHNAMES[@budget.month]}, #{@budget.year}")
+      expect(Budget.last.amount.to_i).to eq(15000)
     end
   end
 end

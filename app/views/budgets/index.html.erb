@@ -24,11 +24,11 @@
       <tr>
         <td><%= @number %> </td>
         <% @number += 1 %>
-        <td><%= link_to "#{Date::MONTHNAMES[budget.first]}", show_all_budgets_path(month: budget.first, year: @year) %></td>
+        <td><%= link_to "#{Date::MONTHNAMES[budget.first]}", show_all_budgets_path(month: budget.first, year: @year) ,class: "show_budgets_link" %></td>
         <td><%= taka(budget.second) %></td>
         <td><%= taka(budget.second - @budget_expense[budget.first].second) %></td>
         <td style="text-align: center;">
-          <%= link_to show_all_expenses_budgets_path(month: budget.first, year: @year) do %>
+          <%= link_to show_all_expenses_budgets_path(month: budget.first, year: @year),class: "show_expenses_link" do %>
             <i class="fa fa-shopping-cart" title="Show Expenses"></i>
           <% end %>
         </td>

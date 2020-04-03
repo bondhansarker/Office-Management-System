@@ -21,5 +21,4 @@ RSpec.feature "Home", type: :feature do
       driver.quit
     end
   end
-
 end

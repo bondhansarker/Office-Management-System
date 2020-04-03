@@ -1,4 +1,4 @@
-<h2>Budget Categories </h2> <br>
+<h1>Budget Categories </h1> <br>
 <% @number=@categories.offset + 1 %>
 <div class="table-responsive-sm">
   <table class="table table-bordered">
@@ -18,11 +18,11 @@
 
         <td style="text-align: center;">
 
-          <%= link_to edit_category_path(category) do %>
+          <%= link_to edit_category_path(category), class: "edit_link" do %>
             <i class="fa fa-edit" title="Edit"></i>
           <% end %>
           |
-          <%= link_to category_path(category), method: :delete, data: {confirm: "Are you sure?"} do %>
+          <%= link_to category_path(category), class: "destroy_link", method: :delete, data: {confirm: "Are you sure?"} do %>
             <i class="fa fa-trash" title="Drop"></i>
           <% end %>
         </td>
