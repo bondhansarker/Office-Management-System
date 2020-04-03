@@ -45,28 +45,28 @@
 
         <% if current_user.admin? || current_user.super_admin? %>
           <td style="text-align: center;">
-            <%= link_to manage_user_path(user) do %>
+            <%= link_to manage_user_path(user), class: "show_link" do %>
               <i class="fa fa-eye" title="Details"></i>
             <% end %>
             |
-            <%= link_to show_all_expenses_manage_user_path(user) do %>
+            <%= link_to show_all_expenses_manage_user_path(user), class: "expense_link" do %>
               <i class="fa fa-shopping-cart" title="All Expenses"></i>
             <% end %>
             |
-            <%= link_to show_all_incomes_manage_user_path(user) do %>
+            <%= link_to show_all_incomes_manage_user_path(user), class: "income_link" do %>
               <i class="fa fa-money" title="All Incomes"></i>
             <% end %>
             |
-            <%= link_to edit_manage_user_path(user) do %>
+            <%= link_to edit_manage_user_path(user), class: "edit_link" do %>
               <i class="fa fa-edit" title="Edit"></i>
             <% end %>
             |
-            <%= link_to manage_user_path(user), method: :delete, data: {confirm: "Are you sure?"} do %>
+            <%= link_to manage_user_path(user), class: "destroy_link", method: :delete, data: {confirm: "Are you sure?"} do %>
               <i class="fa fa-trash" title="Drop"></i>
             <% end %>
           </td>
         <% else %>
-          <%= link_to manage_user_path(user) do %>
+          <%= link_to manage_user_path(user), class: "show_link" do %>
             <i class="fa fa-eye" title="Details"></i>
           <% end %>
         <% end %>

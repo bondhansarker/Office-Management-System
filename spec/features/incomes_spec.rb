@@ -1,85 +1,200 @@
 require 'rails_helper'
-options = Selenium::WebDriver::Firefox::Options.new(args: ['-headless'])
-driver = Selenium::WebDriver.for :firefox, options: options
-
 
 RSpec.feature "Incomes", type: :feature do
-  context "Admin's income" do
-    it "should be be successful" do
-      driver.manage.window.maximize
-      login_as_admin(driver)
-      driver.find_element(:css, "#income_menu").click
-      driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(4) > div > div > div > a:nth-child(1)").click
-      driver.find_element(:css, "h1").text.eql? "Add Income"
-      driver.find_element(:css, "#income_amount").send_keys(1000)
-      driver.find_element(:css, "#datepicker").send_keys Date.today.beginning_of_week, :return
-      sleep(1)
-      driver.find_element(:css, "#income_source").click
-      driver.find_element(:css, "#income_source > option:nth-child(1)").click
-      driver.find_element(css: "input[type='submit']").click
-      driver.current_url.eql? incomes_url
-      driver.find_element(:css, "#income > div.table-responsive-sm > table > tbody > tr:nth-child(2) > td:nth-child(1) > a").click
-      driver.find_element(:css, "h1").text.eql? "All Income List of Shariful Alam of year 2020"
-      element = driver.current_url
-      driver.find_element(:css, "#approved > div.table-responsive-sm > table > tbody > tr:nth-child(2) > td:nth-child(5) > a:nth-child(1) > i").click
-      driver.switch_to.alert.accept
-      driver.current_url.eql? element
-      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-warning").click
-      driver.find_element(:css, "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(2) > td:nth-child(5) > a:nth-child(3) > i").click
-      driver.find_element(:css, "h1").text.eql? "Details of Income"
-      driver.navigate.back
-      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-warning").click
-      element = driver.current_url
-      driver.find_element(:css, "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(2) > td:nth-child(5) > a:nth-child(4) > i").click
-      driver.find_element(:css, "h1").text.eql? "Edit"
-      driver.find_element(:css, "#income_amount").clear
-      driver.find_element(:css, "#income_amount").send_keys(100000)
-      driver.find_element(css: "input[type='submit']").click
-      driver.current_url.eql? element
-      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-warning").click
-      driver.find_element(:css, "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(2) > td:nth-child(5) > a:nth-child(1) > i").click
-      driver.switch_to.alert.accept
-      driver.current_url.eql? element
-      driver.find_element(:css, "#income_menu").click
-      driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(4) > div > div > div > a:nth-child(2)").click
-      driver.find_element(:css, "#income > div.table-responsive-sm > table > tbody > tr:nth-child(2) > td:nth-child(4) > a").click
-      element = driver.find_element(:css, "h2").text
-      element.eql? "Hurrah!! Shariful Alam is getting 9,000.00 Taka BONUS!!"
-      driver.find_element(:css, "#approved > div.table-responsive-sm > table > tbody > tr:nth-child(2) > td:nth-child(5) > a:nth-child(1) > i").click
-      driver.switch_to.alert.accept
-      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-warning").click
-      driver.find_element(:css, "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(2) > td:nth-child(5) > a:nth-child(5) > i").click
-      driver.switch_to.alert.accept
-      logout_from_system(driver)
+
+  before(:each) do
+    @user = FactoryBot.create(:user)
+    @user.role = "Employee"
+    @user.save
+    @income = FactoryBot.create(:income, user: @user)
+    login_as(@user, :scope => :user)
+  end
+
+
+  describe "Create" do
+    it "should be successful" do
+      visit(root_url)
+      click_on 'Income'
+      click_on 'Add new income'
+      expect(current_url).to eq(new_income_url)
+      expect(find(:css, "h1").text).to eq("Add Income")
+      within('form') do
+        fill_in 'income_amount', with: '1000'
+        fill_in 'datepicker', with: '2020-01-01'
+      end
+      click_on 'Save'
+      expect(page).to have_content("Your income has been submitted for approval")
+      expect(current_url).to eq(show_all_incomes_manage_user_url(@income.user))
+      expect(find(:css, "h1").text).to eq("All Income List of #{@income.user.name}")
+      expect(2).to eq(Income.count)
+      expect(page).to have_content("Pending (#{Income.pending.count})")
     end
   end
 
-  context "Employee's income" do
+
+  describe "Show" do
+    context "Pending" do
+      it "should be successful" do
+        visit(root_url)
+        click_on 'Income'
+        click_on 'Incomes'
+        expect(current_url).to eq(show_all_incomes_manage_user_url(@income.user))
+        expect(find(:css, "h1").text).to eq("All Income List of #{@income.user.name}")
+        expect(page).to have_content("Pending (#{Income.pending.count})")
+        expect(page).to have_content(@income.user.name)
+        within('#pending') do
+          page.find('.show_link').click
+        end
+        expect(find(:css, "h1").text).to eq("Details of Income")
+
+        within('.col-md-5') do
+          expect(page).to have_content(@income.user.name)
+          expect(page).to have_content("Pending")
+          expect(current_url).to eq(income_url(@income))
+        end
+        page.find('.btn-dark').click
+        expect(current_url).to eq(show_all_incomes_manage_user_url(@income.user))
+      end
+    end
+  end
+
+  context "Destroy" do
     it "should be successful" do
-      login_as_employee(driver)
-      driver.find_element(:css, "#income_menu").click
-      driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(2) > div > div > div > a:nth-child(1)").click
-      driver.find_element(:css, "h1").text.eql? "Add Income"
-      driver.find_element(:css, "#income_amount").send_keys(1000)
-      driver.find_element(:css, "#datepicker").send_keys Date.today.beginning_of_week, :return
-      driver.find_element(:css, "#income_source").click
-      driver.find_element(:css, "#income_source > option:nth-child(1)").click
-      driver.find_element(css: "input[type='submit']").click
-      element = driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > h1").text
-      element.eql? "All Income List of Hemal"
-      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-warning").click
-      driver.find_element(:css, "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(2) > td:nth-child(5) > a:nth-child(1) > i").click
-      driver.navigate.back
-      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-warning").click
-      driver.find_element(:css, "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(2) > td:nth-child(5) > a:nth-child(2) > i").click
-      driver.find_element(:css, "#income_amount").clear
-      driver.find_element(:css, "#income_amount").send_keys(100000)
-      driver.find_element(css: "input[type='submit']").click
-      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > button.accordion.btn.btn-warning").click
-      driver.find_element(:css, "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(2) > td:nth-child(5) > a:nth-child(3) > i").click
-      driver.switch_to.alert.accept
-      logout_from_system(driver)
-      driver.quit
+      visit(root_url)
+      click_on 'Income'
+      click_on 'Incomes'
+      expect(current_url).to eq(show_all_incomes_manage_user_url(@income.user))
+      expect(find(:css, "h1").text).to eq("All Income List of #{@income.user.name}")
+      expect(page).to have_content("Pending (#{Income.pending.count})")
+      expect(page).to have_content(@income.user.name)
+      within('#pending') do
+        page.find('.destroy_link').click
+      end
+      expect(current_url).to eq(show_all_incomes_manage_user_url(@user))
+      expect(0).to eq(Income.count)
+      expect(page).to have_content("Pending (#{Income.pending.count})")
+    end
+  end
+
+  context "Update" do
+    it "should be successful" do
+      visit(root_url)
+      click_on 'Income'
+      click_on 'Incomes'
+      expect(current_url).to eq(show_all_incomes_manage_user_url(@income.user))
+      expect(find(:css, "h1").text).to eq("All Income List of #{@income.user.name}")
+      expect(page).to have_content("Pending (#{Income.pending.count})")
+      expect(page).to have_content(@income.user.name)
+      within('#pending') do
+        page.find('.edit_link').click
+      end
+      expect(page).to have_content("Edit")
+      expect(page).to have_content("User: #{@income.user.name}")
+      within('form') do
+        fill_in 'income_amount', with: '1500'
+      end
+      click_on 'Update'
+      expect(page).to have_content("Your income information has been updated")
+      expect(current_url).to eq(show_all_incomes_manage_user_url(@income.user))
+      expect(find(:css, "h1").text).to eq("All Income List of #{@income.user.name}")
+      expect(Income.last.amount).to eq(1500)
+    end
+  end
+
+  context "Reject" do
+    it "should be successful" do
+      @admin_user = FactoryBot.create(:user)
+      @admin_user.role = "Admin"
+      @admin_user.save
+      login_as(@admin_user, :scope => :user)
+      visit(root_url)
+      click_on 'Income'
+      click_on 'Incomes'
+      expect(current_url).to eq(incomes_url)
+      expect(find(:css, "h1").text).to eq("All Income List of #{Date.today.year}")
+      within('#income') do
+        click_on "#{@income.user.name}"
+      end
+      expect(current_url).to eq(show_all_incomes_manage_user_url(@income.user))
+      expect(find(:css, "h1")).to have_content("All Income List of #{@income.user.name} of year #{Date.today.year}")
+      expect(page).to have_content("Pending (#{Income.pending.count})")
+      expect(0).to eq(Income.rejected.count)
+      expect(1).to eq(Income.pending.count)
+      within('#pending') do
+        page.find('.reject_link').click
+      end
+      expect(page).to have_content("Income has been rejected")
+      expect(current_url).to eq(show_all_incomes_manage_user_url(@income.user))
+      expect(1).to eq(Income.rejected.count)
+      expect(0).to eq(Income.pending.count)
+      expect(page).to have_content("Rejected (#{Income.rejected.count})")
+    end
+  end
+
+
+  describe "Approval" do
+    context "Approve" do
+      it "should be successful" do
+        @admin_user = FactoryBot.create(:user)
+        @admin_user.role = "Admin"
+        @admin_user.save
+        login_as(@admin_user, :scope => :user)
+        visit(root_url)
+        click_on 'Income'
+        click_on 'Incomes'
+        expect(current_url).to eq(incomes_url)
+        expect(find(:css, "h1").text).to eq("All Income List of #{Date.today.year}")
+        within('#income') do
+          click_on "#{@income.user.name}"
+        end
+        expect(current_url).to eq(show_all_incomes_manage_user_url(@income.user))
+        expect(find(:css, "h1")).to have_content("All Income List of #{@income.user.name} of year #{Date.today.year}")
+        expect(page).to have_content("Pending (#{Income.pending.count})")
+        expect(0).to eq(Income.rejected.count)
+        expect(1).to eq(Income.pending.count)
+        within('#pending') do
+          page.find('.approve_link').click
+        end
+        expect(page).to have_content("Income has been approved")
+        expect(current_url).to eq(show_all_incomes_manage_user_url(@income.user))
+
+        expect(0).to eq(Income.pending.count)
+        expect(1).to eq(Income.approved.count)
+        expect(page).to have_content("Approved (#{Income.approved.count})")
+        expect(page).to have_content("Pending (#{Income.pending.count})")
+      end
+    end
+
+    context "Undo" do
+      it "should be successful" do
+        @admin_user = FactoryBot.create(:user)
+        @admin_user.role = "Admin"
+        @admin_user.save
+        login_as(@admin_user, :scope => :user)
+        @income.approved!
+        visit(root_url)
+        click_on 'Income'
+        click_on 'Incomes'
+        expect(current_url).to eq(incomes_url)
+        expect(find(:css, "h1").text).to eq("All Income List of #{Date.today.year}")
+        within('#income') do
+          click_on "#{@income.user.name}"
+        end
+        expect(current_url).to eq(show_all_incomes_manage_user_url(@income.user))
+        expect(find(:css, "h1")).to have_content("All Income List of #{@income.user.name} of year #{Date.today.year}")
+        expect(page).to have_content("Pending (#{Income.pending.count})")
+        expect(0).to eq(Income.pending.count)
+        expect(1).to eq(Income.approved.count)
+        within('#approved') do
+          page.find('.undo_link').click
+        end
+        expect(page).to have_content("The income status has been changed successfully")
+        expect(current_url).to eq(show_all_incomes_manage_user_url(@income.user))
+        expect(1).to eq(Income.pending.count)
+        expect(0).to eq(Income.approved.count)
+        expect(page).to have_content("Approved (#{Income.approved.count})")
+        expect(page).to have_content("Pending (#{Income.pending.count})")
+      end
     end
   end
 end

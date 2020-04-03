@@ -11,12 +11,12 @@
 
   <% if can? :approve, income %>
     <% if income.approved? %>
-      <%= link_to approve_income_path(income), method: :put, data: {confirm: 'Are you sure?'} do %>
+      <%= link_to approve_income_path(income), class: "undo_link", method: :put, data: {confirm: 'Are you sure?'} do %>
         <i class="fa fa-undo" title="Undo"></i>
       <% end %>
       |
     <% else %>
-      <%= link_to approve_income_path(income), method: :put, data: {confirm: 'Are you sure to Approve?'} do %>
+      <%= link_to approve_income_path(income), class: "approve_link", method: :put, data: {confirm: 'Are you sure to Approve?'} do %>
         <i class="fa fa-check" title="Approve"></i>
       <% end %>
       |
@@ -24,26 +24,26 @@
   <% end %>
 
   <% if can? :reject, income %>
-    <%= link_to reject_income_path(income), method: :put, data: {confirm: 'Are you sure to Reject?'} do %>
+    <%= link_to reject_income_path(income), class: "reject_link", method: :put, data: {confirm: 'Are you sure to Reject?'} do %>
       <i class="fa fa-ban" title="Reject"></i>
     <% end %>
     |
   <% end %>
 
   <% if can? :show, income %>
-    <%= link_to income_path(income) do %>
+    <%= link_to income_path(income), class: "show_link" do %>
       <i class="fa fa-eye" title="Details"></i>
     <% end %>
   <% end %>
 
   <% if can? :update, income %>|
-    <%= link_to edit_income_path(income) do %>
+    <%= link_to edit_income_path(income), class: "edit_link" do %>
       <i class="fa fa-edit" title="Edit"></i>
     <% end %>
   <% end %>
 
   <% if can? :destroy, income %>
-    |<%= link_to income_path(income), method: :delete, data: {confirm: 'Are you sure?'} do %>
+    |<%= link_to income_path(income), class: "destroy_link", method: :delete, data: {confirm: 'Are you sure?'} do %>
       <i class="fa fa-trash" title="Drop"></i>
     <% end %>
   <% end %>

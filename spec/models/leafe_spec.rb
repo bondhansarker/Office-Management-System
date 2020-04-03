@@ -4,7 +4,7 @@ RSpec.describe Leafe, type: :model do
   before(:each) do
     @user = FactoryBot.build(:user)
     @allocated_leafe = FactoryBot.build(:allocated_leafe, user: @user)
-    @leafe = FactoryBot.build(:leafe, user: @user)
+    @income = FactoryBot.build(:income, user: @user)
   end
 
   describe "Create" do
@@ -12,8 +12,8 @@ RSpec.describe Leafe, type: :model do
       count = 0
       @user.save
       @allocated_leafe.save
-      @leafe.save
-      expect(@leafe.valid?).to eq(true)
+      @income.save
+      expect(@income.valid?).to eq(true)
       expect(count+1).to eq(Leafe.count)
     end
   end
@@ -21,8 +21,8 @@ RSpec.describe Leafe, type: :model do
   describe "scope testing" do
     context ".with_leafe_type" do
       it "should return collection of leave with given type" do
-        @leafe = FactoryBot.create(:leafe, leave_type: Leafe::TL, user: @user)
-        expect(Leafe.with_leafe_type(Leafe::PL)).not_to include(@leafe)
+        @income = FactoryBot.create(:income, leave_type: Leafe::TL, user: @user)
+        expect(Leafe.with_leafe_type(Leafe::PL)).not_to include(@income)
       end
     end
   end
@@ -30,54 +30,54 @@ RSpec.describe Leafe, type: :model do
   describe "method testing" do
     context "#update_allocated_leave" do
       it "should update the user's allocated leave" do
-        @leafe.status = 1
-        @leafe.update_allocated_leave
-        expect(@leafe.user.allocated_leafe.used_leave).to eq(3)
+        @income.status = 1
+        @income.update_allocated_leave
+        expect(@income.user.allocated_leafe.used_leave).to eq(3)
       end
     end
 
     context "#check_validity_of_leave" do
       it "should return true for valid date range" do
-        days = Leafe.count_days(@leafe.start_date, @leafe.end_date)
-        expect(@leafe.check_validity_of_leave(days)).to eq(true)
+        days = Leafe.count_days(@income.start_date, @income.end_date)
+        expect(@income.check_validity_of_leave(days)).to eq(true)
       end
 
       it "should return false for invalid date range" do
-        @leafe.end_date = Date.today + 30.days
-        days = Leafe.count_days(@leafe.start_date, @leafe.end_date)
-        expect(@leafe.check_validity_of_leave(days)).to eq(false)
+        @income.end_date = Date.today + 30.days
+        days = Leafe.count_days(@income.start_date, @income.end_date)
+        expect(@income.check_validity_of_leave(days)).to eq(false)
       end
     end
 
     context "#count_days" do
       it "should return 0 if start date is not present" do
-        @leafe.start_date = nil
-        days = Leafe.count_days(@leafe.start_date, @leafe.end_date)
+        @income.start_date = nil
+        days = Leafe.count_days(@income.start_date, @income.end_date)
         expect(days).to eq(0)
       end
 
       it "should return 0 if end date is not present" do
-        @leafe.end_date = nil
-        days = Leafe.count_days(@leafe.start_date, @leafe.end_date)
+        @income.end_date = nil
+        days = Leafe.count_days(@income.start_date, @income.end_date)
         expect(days).to eq(0)
       end
 
       it "should return number of days for valid date range" do
-        days = Leafe.count_days(@leafe.start_date, @leafe.end_date)
+        days = Leafe.count_days(@income.start_date, @income.end_date)
         expect(days).to eq(3)
       end
     end
 
     context "#admin_approval" do
       it "should not approve leave if the user is not admin" do
-        @leafe.user.role = 'Employee'
-        @leafe.send(:admin_approval)
-        expect(@leafe.status).not_to eq('approved')
+        @income.user.role = 'Employee'
+        @income.send(:admin_approval)
+        expect(@income.status).not_to eq('approved')
       end
 
       it "should approve leave if the user is admin" do
-        @leafe.send(:admin_approval)
-        expect(@leafe.status).to eq('approved')
+        @income.send(:admin_approval)
+        expect(@income.status).to eq('approved')
       end
     end
   end
