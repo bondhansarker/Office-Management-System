@@ -1,6 +1,4 @@
 require 'rails_helper'
-options = Selenium::WebDriver::Firefox::Options.new(args: ['-headless'])
-driver = Selenium::WebDriver.for :firefox, options: options
 
 RSpec.feature "Budget", type: :feature do
 

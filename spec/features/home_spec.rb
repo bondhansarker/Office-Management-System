@@ -1,24 +1,17 @@
 require 'rails_helper'
-options = Selenium::WebDriver::Firefox::Options.new(args: ['-headless'])
-driver = Selenium::WebDriver.for :firefox, options: options
-
 RSpec.feature "Home", type: :feature do
 
   before(:each) do
     @user = FactoryBot.create(:user)
+    login_as(@user, :scope => :user)
   end
 
-  context "sign in" do
+  context "After login" do
     it "displays the dashboard of the application" do
-      login_as_super_admin(driver)
-      logout_from_system(driver)
-      sleep(1)
-      login_as_admin(driver)
-      logout_from_system(driver)
-      sleep(1)
-      login_as_employee(driver)
-      logout_from_system(driver)
-      driver.quit
+      visit(root_url)
+      expect(find(:css, "h3").text).to eq("#{@user.role}'s Dashboard")
+      expect(page).to have_content("Budget Statistics")
+      expect(page).to have_content("Revenue Graph")
     end
   end
 end
