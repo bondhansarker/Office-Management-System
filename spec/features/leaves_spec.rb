@@ -1,65 +1,178 @@
 require 'rails_helper'
-options = Selenium::WebDriver::Firefox::Options.new(args: ['-headless'])
-driver = Selenium::WebDriver.for :firefox, options: options
-
 
 RSpec.feature "Leaves", type: :feature do
-  context "Appoint Leave" do
+
+  before(:each) do
+    @user = FactoryBot.create(:user)
+    @user.role = "Employee"
+    @user.save
+    @allocated_leafe = FactoryBot.create(:allocated_leafe, user: @user)
+    @leafe = FactoryBot.create(:leafe, user: @user)
+    login_as(@user, :scope => :user)
+  end
+
+  describe "Create" do
     it "should be successful" do
-      login_as_admin(driver)
-      driver.find_element(:css, "#leave_menu").click
-      driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(5) > div > div > div > a:nth-child(3)").click
-      driver.find_element(:css, "h1").text.eql? "All Leave Requests"
-      driver.find_element(:css, "#leave_menu").click
-      driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(5) > div > div > div > a:nth-child(2)").click
-      driver.find_element(:css, "h1").text.eql? "List of Leave of Year : 2020"
-      driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > a").click
-      driver.find_element(:css, "h1").text.eql? "Allocate Leave"
-      driver.find_element(:css, "#allocated_leafe_user_id > option:nth-child(2)").click
-      driver.find_element(:css, "#allocated_leafe_year > option:nth-child(6)").click
-      driver.find_element(:css, "#allocated_leafe_total_leave").send_keys(30)
-      driver.find_element(css: "input[type='submit']").click
-      logout_from_system(driver)
+      visit(root_url)
+      click_on 'Leave'
+      click_on 'Apply for Leave'
+      expect(current_url).to eq(new_leafe_url)
+      expect(find(:css, "h1").text).to eq("Apply for Leave")
+      within('form') do
+        fill_in 'datepicker', with: '2020-01-01'
+        fill_in 'datepicker2', with: '2020-01-03'
+        fill_in 'leafe_reason', with: 'Test Reason'
+      end
+      click_on 'Save'
+      expect(page).to have_content("Your leave application has been submitted for approval")
+      expect(current_url).to eq(leaves_url)
+      expect(find(:css, "h1").text).to eq("All Leave Requests")
+      expect(2).to eq(Leafe.count)
+      expect(page).to have_content("Pending (#{Leafe.pending.count})")
     end
   end
 
-  context "Create new Leave" do
-    it "should be successful" do
-      login_as_employee(driver)
-      driver.find_element(:css, "#leave_menu").click
-      driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(3) > div > div > div > a:nth-child(1)").click
-      element = driver.find_element(:css, "h1").text
-      "Apply for Leave".eql? element
-      driver.find_element(:css, "#datepicker").send_keys(Date.today.beginning_of_week)
-      driver.find_element(:css, "#datepicker2").send_keys(Date.today.at_beginning_of_week + 2.days)
-      driver.find_element(:css, "#leafe_reason").send_keys("test reason")
-      driver.find_element(:css, "#leafe_leave_type").send_keys("Training")
-      driver.find_element(css: "input[type='submit']").click
-      driver.current_url.eql? leaves_url
-      driver.find_element(:css, "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(2) > td:nth-child(5) > a:nth-child(1) > i").click
-      driver.navigate.back
-      driver.current_url.eql? leaves_url
-      driver.find_element(:css, "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(2) > td:nth-child(5) > a:nth-child(2) > i").click
-      driver.find_element(:css, "h1").text.eql? "Edit"
-      driver.find_element(:css, "#leafe_reason").send_keys("test reason edited")
-      driver.find_element(css: "input[type='submit']").click
-      driver.current_url.eql? leaves_url
-      logout_from_system(driver)
+
+  describe "Show" do
+    context "Pending" do
+      it "should be successful" do
+        visit(leaves_url)
+        expect(current_url).to eq(leaves_url)
+        expect(find(:css, "h1").text).to eq("All Leave Requests")
+        expect(page).to have_content("Pending (#{Leafe.pending.count})")
+        expect(page).to have_content(@leafe.user.name)
+        within('#pending') do
+          page.find('.show_link').click
+        end
+        within('.col-md-5') do
+          expect(page).to have_content(@leafe.user.name)
+          expect(page).to have_content("Pending")
+          expect(page).to have_content(@leafe.reason)
+          expect(current_url).to eq(leafe_url(@leafe))
+        end
+        page.find('.btn-dark').click
+        expect(current_url).to eq(leaves_url)
+      end
     end
   end
 
-  context "Approve leave" do
+  context "Destroy" do
     it "should be successful" do
-      login_as_admin(driver)
-      driver.find_element(:css, "#leave_menu").click
-      driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(5) > div > div > div > a:nth-child(3)").click
-      driver.find_element(:css, "h1").text.eql? "All Leave Requests"
-      driver.find_element(:css, "#pending > div.table-responsive-sm > table > tbody > tr:nth-child(2) > td:nth-child(5) > a:nth-child(1) > i").click
-      driver.switch_to.alert.accept
-      driver.find_element(:css, "h1").text.eql? "List of Leaves of Hemal"
-      logout_from_system(driver)
-      driver.quit
+      visit(leaves_url)
+      expect(current_url).to eq(leaves_url)
+      expect(find(:css, "h1").text).to eq("All Leave Requests")
+      expect(page).to have_content("Pending (#{Leafe.pending.count})")
+      expect(page).to have_content(@leafe.user.name)
+      expect(1).to eq(Leafe.count)
+      within('#pending') do
+        page.find('.destroy_link').click
+      end
+      expect(current_url).to eq(leaves_url)
+      expect(0).to eq(Leafe.count)
+      expect(page).to have_content("Pending (#{Leafe.pending.count})")
     end
   end
 
+  context "Update" do
+    it "should be successful" do
+      visit(leaves_url)
+      expect(current_url).to eq(leaves_url)
+      expect(find(:css, "h1").text).to eq("All Leave Requests")
+      expect(page).to have_content("Pending (#{Leafe.pending.count})")
+      expect(page).to have_content(@leafe.user.name)
+      expect(1).to eq(Leafe.count)
+      within('#pending') do
+        page.find('.edit_link').click
+      end
+      expect(page).to have_content("Edit")
+      expect(page).to have_content("User: #{@leafe.user.name}")
+      within('form') do
+        fill_in 'leafe_reason', with: 'Test Reason Updated'
+      end
+      click_on 'Update'
+      expect(page).to have_content("Leave information has been updated")
+      expect(current_url).to eq(leaves_url)
+      expect(find(:css, "h1").text).to eq("All Leave Requests")
+      expect(Leafe.last.reason).to eq("Test Reason Updated")
+    end
+  end
+
+  context "Reject" do
+    it "should be successful" do
+      @admin_user = FactoryBot.create(:user)
+      @admin_user.role = "Admin"
+      @admin_user.save
+      login_as(@admin_user, :scope => :user)
+      visit(root_url)
+      click_on 'Leave'
+      click_on 'Leave Requests'
+      expect(current_url).to eq(leaves_url)
+      expect(find(:css, "h1").text).to eq("All Leave Requests")
+      expect(0).to eq(Leafe.rejected.count)
+      expect(1).to eq(Leafe.pending.count)
+      within('#pending') do
+        page.find('.reject_link').click
+      end
+      expect(page).to have_content("The leave has been changed successfully")
+      expect(current_url).to eq(show_all_allocated_leafe_url(@user.allocated_leafe))
+      expect(1).to eq(Leafe.rejected.count)
+      expect(0).to eq(Leafe.pending.count)
+      expect(page).to have_content("Rejected (#{Leafe.rejected.count})")
+    end
+  end
+  describe "Approval" do
+    context "Approve" do
+      it "should be successful" do
+        @admin_user = FactoryBot.create(:user)
+        @admin_user.role = "Admin"
+        @admin_user.save
+        login_as(@admin_user, :scope => :user)
+        visit(root_url)
+        click_on 'Leave'
+        click_on 'Leave Requests'
+        expect(current_url).to eq(leaves_url)
+        expect(find(:css, "h1").text).to eq("All Leave Requests")
+        expect(0).to eq(Leafe.approved.count)
+        expect(1).to eq(Leafe.pending.count)
+
+        within('#pending') do
+          page.find('.approve_link').click
+        end
+        expect(page).to have_content("The leave has been approved successfully")
+        expect(current_url).to eq(show_all_allocated_leafe_url(@leafe.user.allocated_leafe))
+
+        expect(0).to eq(Leafe.pending.count)
+        expect(1).to eq(Leafe.approved.count)
+        expect(page).to have_content("Approved (#{Leafe.approved.count})")
+        expect(page).to have_content("Pending (#{Leafe.pending.count})")
+      end
+    end
+
+    context "Undo" do
+      it "should be successful" do
+        @admin_user = FactoryBot.create(:user)
+        @admin_user.role = "Admin"
+        @admin_user.save
+        login_as(@admin_user, :scope => :user)
+        @leafe.approved!
+        visit(root_url)
+        click_on 'Leave'
+        click_on 'Leave Requests'
+        expect(current_url).to eq(leaves_url)
+        expect(find(:css, "h1").text).to eq("All Leave Requests")
+        expect(1).to eq(Leafe.approved.count)
+        expect(0).to eq(Leafe.pending.count)
+
+        within('#approved') do
+          page.find('.undo_link').click
+        end
+        expect(page).to have_content("Leave information has been changed successfully")
+        expect(current_url).to eq(show_all_allocated_leafe_url(@leafe.user.allocated_leafe))
+        expect(1).to eq(Leafe.pending.count)
+        expect(0).to eq(Leafe.approved.count)
+        expect(page).to have_content("Approved (#{Leafe.approved.count})")
+        expect(page).to have_content("Pending (#{Leafe.pending.count})")
+      end
+    end
+  end
 end

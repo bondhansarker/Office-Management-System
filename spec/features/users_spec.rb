@@ -1,48 +1,127 @@
 require 'rails_helper'
-options = Selenium::WebDriver::Firefox::Options.new(args: ['-headless'])
-driver = Selenium::WebDriver.for :firefox, options: options
 
+RSpec.feature "Leaves", type: :feature do
 
-RSpec.feature "Users", type: :feature do
-  context "Create user" do
+  before(:each) do
+    @user = FactoryBot.create(:user)
+    @user.role = "Super Admin"
+    @user.save
+    login_as(@user, :scope => :user)
+  end
+
+  describe "Create" do
     it "should be successful" do
-      login_as_admin(driver)
-      driver.find_element(:css, "#user_menu").click
-      driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(6) > div > div > div > a:nth-child(1)").click
-      driver.find_element(:css, "#employee_menu").click
-      driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(1) > div > div > div > a:nth-child(1)").click
-      element = driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > h2").text
-      element.eql? "Create a New User"
-      driver.find_element(:css, "#user_email").send_keys("test@gmail.com")
-      driver.find_element(:css, "#user_password").send_keys("111111")
-      driver.find_element(:css, "#user_password_confirmation").send_keys("111111")
-      driver.find_element(:css, "#user_name").send_keys("test user")
-      driver.find_element(:css, "#user_phone").send_keys("000111")
-      driver.find_element(:css, "#user_target_amount").send_keys(10000)
-      driver.find_element(:css, "#user_bonus_percentage").send_keys(10)
-      driver.find_element(:css, "#user_role").click
-      driver.find_element(:css, "#user_role > option:nth-child(3)").click
-      driver.find_element(:css, "#user_designation").click
-      driver.find_element(:css, "#user_designation > option:nth-child(1)").click
-      driver.find_element(:css, "input[type='submit']").click
-      driver.current_url.eql? manage_users_url
-      driver.find_element(:xpath, "/html/body/div[1]/div[2]/div[2]/table/tbody/tr[4]/td[6]/a[1]/i").click
-      driver.navigate.back
-      driver.find_element(:xpath, "/html/body/div[1]/div[2]/div[2]/table/tbody/tr[4]/td[6]/a[4]/i").click
-      element = driver.find_element(:css, "body > div.container-fluid.px-4.mx-auto > div.container-fluid.px-4.mx-auto > h2").text
-      element.eql? "Edit User Information"
-      driver.find_element(:css, "#user_name").clear
-      driver.find_element(:css, "#user_name").send_keys("test user edited")
-      driver.find_element(:css, "input[type='submit']").click
-      driver.find_element(:css, "#employee_menu").click
-      driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(1) > div > div > div > a:nth-child(2)").click
-      driver.find_element(:xpath, "/html/body/div[1]/div[2]/div[2]/table/tbody/tr[4]/td[6]/a[5]/i").click
-      driver.switch_to.alert.accept
-      driver.find_element(:css, "#user_menu").click
-      driver.find_element(:css, "#navbarResponsive > ul > li:nth-child(6) > div > div > div > a:nth-child(1)").click
-      driver.switch_to.alert.accept
-      logout_from_system(driver)
-      driver.quit
+      visit(root_url)
+      click_on 'Employee'
+      click_on 'Add new employee'
+      expect(current_url).to eq(new_manage_user_url)
+      expect(find(:css, "h2").text).to eq("Create a New User")
+      within('form') do
+        fill_in 'user_email', with: 'test@gmail.com'
+        fill_in 'user_password', with: '111111'
+        fill_in 'user_password_confirmation', with: '111111'
+        fill_in 'user_name', with: 'Test User'
+        fill_in 'user_phone', with: '000000111'
+        fill_in 'user_target_amount', with: 10000
+        fill_in 'user_bonus_percentage', with: 10
+        select('Employee', from: 'user_role')
+      end
+      click_on 'Create new user'
+      expect(page).to have_content("User has been created successfully")
+      expect(current_url).to eq(manage_users_url)
+      expect(find(:css, "h1").text).to eq("Employee List")
+      expect(2).to eq(User.count)
+    end
+  end
+
+
+  describe "Show" do
+    it "should be successful" do
+      visit(manage_users_url)
+      expect(current_url).to eq(manage_users_url)
+      expect(find(:css, "h1").text).to eq("Employee List")
+      within('.table-responsive-sm') do
+        expect(page).to have_content("#{@user.name}")
+        page.find('.show_link').click
+      end
+
+      within('.card') do
+        expect(page).to have_content(@user.name)
+        expect(page).to have_content(@user.email)
+        expect(page).to have_content(@user.phone)
+        expect(current_url).to eq(manage_user_url(@user))
+      end
+      page.find('.btn-dark').click
+      expect(current_url).to eq(manage_users_url)
+      expect(find(:css, "h1").text).to eq("Employee List")
+    end
+  end
+
+
+  describe "Update" do
+    it "should be successful" do
+      visit(manage_users_url)
+      expect(current_url).to eq(manage_users_url)
+      expect(find(:css, "h1").text).to eq("Employee List")
+      within('.table-responsive-sm') do
+        expect(page).to have_content("#{@user.name}")
+        page.find('.edit_link').click
+      end
+      expect(find(:css, "h2").text).to have_content("Edit User Information")
+      expect(current_url).to eq(edit_manage_user_url(@user))
+      within('form') do
+        fill_in 'user_name', with: 'Test User Updated'
+      end
+      click_on 'Update'
+      expect(page).to have_content("User data has been updated successfully")
+      expect(current_url).to eq(manage_user_url(@user))
+      within('.card') do
+        expect(page).to have_content('Test User Updated')
+        expect(page).to have_content(@user.email)
+        expect(page).to have_content(@user.phone)
+        expect(current_url).to eq(manage_user_url(@user))
+      end
+    end
+  end
+
+  context "All Expenses" do
+    it "should be successful" do
+      visit(manage_users_url)
+      expect(current_url).to eq(manage_users_url)
+      expect(find(:css, "h1").text).to eq("Employee List")
+      within('.table-responsive-sm') do
+        expect(page).to have_content("#{@user.name}")
+        page.find('.expense_link').click
+      end
+      expect(current_url).to eq(show_all_expenses_manage_user_url(@user))
+      within('.card') do
+        expect(find(:css, "h3").text).to have_content("Expense List for #{@user.name}")
+      end
+      expect(page).to have_content("Pending (#{@user.expenses.pending.count})")
+      expect(page).to have_content("Approved (#{@user.expenses.approved.count})")
+      expect(page).to have_content("Rejected (#{@user.expenses.rejected.count})")
+      click_on 'Back'
+      expect(current_url).to eq(manage_users_url)
+      expect(find(:css, "h1").text).to eq("Employee List")
+    end
+  end
+  context "All Incomes" do
+    it "should be successful" do
+      visit(manage_users_url)
+      expect(current_url).to eq(manage_users_url)
+      expect(find(:css, "h1").text).to eq("Employee List")
+      within('.table-responsive-sm') do
+        expect(page).to have_content("#{@user.name}")
+        page.find('.income_link').click
+      end
+      expect(current_url).to eq(show_all_incomes_manage_user_url(@user))
+      expect(find(:css, "h1").text).to have_content("All Income List of #{@user.name} of year #{Date.today.year}")
+      expect(page).to have_content("Pending (#{@user.incomes.pending.count})")
+      expect(page).to have_content("Approved (#{@user.incomes.approved.count})")
+      expect(page).to have_content("Rejected (#{@user.incomes.rejected.count})")
+      click_on 'Back'
+      expect(current_url).to eq(manage_users_url)
+      expect(find(:css, "h1").text).to eq("Employee List")
     end
   end
 end
