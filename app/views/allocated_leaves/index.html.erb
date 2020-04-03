@@ -41,7 +41,6 @@
         <td><%= @number %> </td>
         <% @number+=1 %>
         <td>
-          <%#= raise l.user.name %>
           <%= link_to allocated_leafe.user.name, show_all_allocated_leafe_path(allocated_leafe) %>
         </td>
         <td>
@@ -55,19 +54,19 @@
         </td>
         <td style="text-align: center;">
           <% if can? :read, allocated_leafe %>
-            <%= link_to allocated_leafe_path(allocated_leafe) do %>
+            <%= link_to allocated_leafe_path(allocated_leafe), class: "show_link" do %>
               <i class="fa fa-eye" title="Show Details"></i>
             <% end %>
           <% end %>
           <% if can? :write, allocated_leafe %>
             |
-            <%= link_to edit_allocated_leafe_path(allocated_leafe) do %>
+            <%= link_to edit_allocated_leafe_path(allocated_leafe), class: "edit_link" do %>
               <i class="fa fa-edit" title="Edit"></i>
             <% end %>
           <% end %>
           <% if can? :destroy, allocated_leafe %>
             |
-            <%= link_to allocated_leafe_path(allocated_leafe), method: :delete, data: {confirm: "Are you sure?"} do %>
+            <%= link_to allocated_leafe_path(allocated_leafe), class: "destroy_link", method: :delete, data: {confirm: "Are you sure?"} do %>
               <i class="fa fa-trash" title="Drop"></i>
             <% end %>
           <% end %>

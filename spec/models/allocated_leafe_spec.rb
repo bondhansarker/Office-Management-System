@@ -21,11 +21,11 @@ RSpec.describe AllocatedLeafe, type: :model do
       it "should return a hash of leave count based on leave type" do
         count = 0
         @allocated_leafe.save
-        @leafe_1 = FactoryBot.create(:income, leave_type: Leafe::PL, user: @user)
-        @leafe_2 = FactoryBot.create(:income, leave_type: Leafe::PL, user: @user)
-        @leafe_3 = FactoryBot.create(:income, leave_type: Leafe::VL, user: @user)
-        @leafe_4 = FactoryBot.create(:income, leave_type: Leafe::TL, user: @user)
-        @leafe_5 = FactoryBot.create(:income, leave_type: Leafe::ML, user: @user)
+        @leafe_1 = FactoryBot.create(:leafe, leave_type: Leafe::PL, user: @user)
+        @leafe_2 = FactoryBot.create(:leafe, leave_type: Leafe::PL, user: @user)
+        @leafe_3 = FactoryBot.create(:leafe, leave_type: Leafe::VL, user: @user)
+        @leafe_4 = FactoryBot.create(:leafe, leave_type: Leafe::TL, user: @user)
+        @leafe_5 = FactoryBot.create(:leafe, leave_type: Leafe::ML, user: @user)
 
         @leaves = @allocated_leafe.allocated_leaves_count_for(@user)
         expect(@leaves[:personal]).to eq(2)
